@@ -104,18 +104,23 @@ class DDIMScheduler(DDPMScheduler):
         # - pred_prev_sample -> "x_t-1"
         
         t = timestep
-        prev_t = None 
+        prev_t = self.previous_timestep(t)
         
         # TODO: 1. compute alphas, betas
-        alpha_prod_t = None 
-        alpha_prod_t_prev = None 
-        beta_prod_t = None 
+        alpha_prod_t = self.alphas_cumprod[t]
+        alpha_prod_t_prev = (
+            self.alphas_cumprod[prev_t]
+            if t > 0
+            else torch.tensor(1.0, device=alpha_prod_t.device, dtype=alpha_prod_t.dtype)
+        )
+        # beta_prod_t = None 
         
         # TODO: 2. compute predicted original sample from predicted noise also called
         # "predicted x_0" of formula (15) from https://arxiv.org/pdf/2006.11239.pdf
         if self.prediction_type == 'epsilon':
-            pred_original_sample = None 
-            pred_epsilon = None 
+            pred_epsilon = model_output
+            # predicted x_0 = (x_t - sqrt(1 - alpha_t) * e_theta(x_t, t)) / sqrt(alpha_t)
+            pred_original_sample = (sample - torch.sqrt(1 - alpha_prod_t) * pred_epsilon) / torch.sqrt(alpha_prod_t) 
         else:
             raise NotImplementedError(f"Prediction type {self.prediction_type} not implemented.")
 
@@ -127,22 +132,40 @@ class DDIMScheduler(DDPMScheduler):
 
         # TODO: 4. compute variance: "sigma_t(η)" -> see formula (16)
         # σ_t = sqrt((1 − α_t−1)/(1 − α_t)) * sqrt(1 − α_t/α_t−1)
-        variance = None 
-        std_dev_t = None
+        
+        # ~~~ Comments from Yash ~~~~
+        # check if we should call the above _get_variance method here? Or alternatively, implement the formula manually? 
+        # Also, do we need to multiply variance with eta? self.variance_type does the same function as eta but not sure if we should multiply or not.
+        # maybe we need to change self.variance_type based on the eta value???
+
+        # an alternative implementation idea is to change self.variance_type based on eta values. Like this:
+        # Feel free to comment this out if it looks better
+        # if eta == 0:
+        #     # Fully deterministic sampling
+        #     self.variance_type = "deterministic"
+        # elif eta == 1:
+        #     # Stochastic sampling like DDPM
+        #     self.variance_type = "fixed_large"
+        # else:
+        #     # Interpolated behavior for 0 < eta < 1
+        #     self.variance_type = "fixed_large"
+
+        variance = self._get_variance(t)
+        std_dev_t = torch.sqrt(variance) * eta  # not sure if we should be multiplying with eta here? The assumption should be that eta is already incorporated inside the variance function, right? This can lead to double multiplications. Please check once, thanks.
 
         # TODO: 5. compute "direction pointing to x_t" of formula (12) from https://arxiv.org/pdf/2010.02502.pdf
-        pred_sample_direction = None 
+        pred_sample_direction = torch.sqrt(1 - alpha_prod_t_prev - variance) * pred_epsilon 
 
         # TODO: 6. compute x_t without "random noise" of formula (12) from https://arxiv.org/pdf/2010.02502.pdf
-        prev_sample = None 
+        prev_sample = torch.sqrt(alpha_prod_t_prev) * pred_original_sample + pred_sample_direction
 
         # TODO: 7. Add noise with eta
         if eta > 0:
             variance_noise = randn_tensor(
                     model_output.shape, generator=generator, device=model_output.device, dtype=model_output.dtype
             )
-            variance = None
+            # variance = None
 
-            prev_sample = None 
+            prev_sample = prev_sample + std_dev_t * variance_noise
         
         return prev_sample
