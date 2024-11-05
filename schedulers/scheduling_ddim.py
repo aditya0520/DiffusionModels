@@ -30,15 +30,36 @@ class DDIMScheduler(DDPMScheduler):
         
         
         # TODO: calculate $beta_t$ for the current timestep using the cumulative product of alphas
-        prev_t = None
-        alpha_prod_t = None
-        alpha_prod_t_prev = None 
-        beta_prod_t = None 
-        beta_prod_t_prev = None 
+        prev_t = self.previous_timestep(t)
+        alpha_prod_t = self.alphas_cumprod[t]
+        alpha_prod_t_prev = self.alphas_cumprod[prev_t] if t > 0 else torch.tensor(1.0, device=alpha_prod_t.device)
+        beta_prod_t = 1 - alpha_prod_t
+        beta_prod_t_prev = 1 - alpha_prod_t_prev
         
         # TODO: DDIM equation for variance
-        variance = None 
 
+        # In DDIM paper (https://arxiv.org/abs/2010.02502), the variance can be:
+        # 1. Zero for deterministic sampling (η = 0)
+        # 2. Follow DDPM's variance for η = 1
+        # 3. Follow a partial schedule for 0 < η < 1
+        
+        # For this implementation, we'll set variance to 0 for deterministic sampling
+        variance = torch.zeros_like(alpha_prod_t)
+
+        if self.variance_type == "deterministic":
+            # Set variance to zero for deterministic DDIM sampling
+            variance = torch.zeros_like(alpha_prod_t)
+        elif self.variance_type == "fixed_small":
+            variance = self.betas[t]
+        elif self.variance_type == "fixed_large":
+            # Use DDPM-like variance schedule
+            variance = beta_prod_t_prev / beta_prod_t * (1 - alpha_prod_t / alpha_prod_t_prev)
+        else:
+            raise NotImplementedError(f"Variance type {self.variance_type} not implemented for DDIM.")
+        
+        # Clamp variance to prevent numerical issues
+        variance = torch.clamp(variance, min=1e-20)
+        
         return variance
     
     
