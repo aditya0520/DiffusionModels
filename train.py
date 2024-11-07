@@ -19,6 +19,7 @@ from schedulers import DDPMScheduler, DDIMScheduler
 from pipelines import DDPMPipeline
 from utils import seed_everything, init_distributed_device, is_primary, AverageMeter, str2bool, save_checkpoint
 
+wandb.login(key="7664f3b17a98ffe7c64b549e349123b61a9d3024") 
 
 logger = get_logger(__name__)
 
@@ -32,7 +33,7 @@ def parse_args():
     # data 
     parser.add_argument("--data_dir", type=str, default='./data/imagenet100_128x128/train', help="data folder") 
     parser.add_argument("--image_size", type=int, default=128, help="image size")
-    parser.add_argument("--batch_size", type=int, default=4, help="per gpu batch size")
+    parser.add_argument("--batch_size", type=int, default=8, help="per gpu batch size")
     parser.add_argument("--num_workers", type=int, default=8, help="batch size")
     parser.add_argument("--num_classes", type=int, default=100, help="number of classes in dataset")
 
@@ -77,20 +78,20 @@ def parse_args():
     parser.add_argument("--use_ddim", type=str2bool, default=False, help="use ddim sampler for inference")
     
     # checkpoint path for inference
-    parser.add_argument("--ckpt", type=str, default=None, help="checkpoint path for inference")
+    parser.add_argument("--ckpt", type=str, default="./checkpoint", help="checkpoint path for inference")
     
     # first parse of command-line args to check for config file
     args = parser.parse_args()
     
-    # If a config file is specified, load it and set defaults
-    if args.config is not None:
-        with open(args.config, 'r', encoding='utf-8') as f:
-            file_yaml = yaml.YAML()
-            config_args = file_yaml.load(f)
-            parser.set_defaults(**config_args)
+    # # If a config file is specified, load it and set defaults
+    # if args.config is not None:
+    #     with open(args.config, 'r', encoding='utf-8') as f:
+    #         file_yaml = yaml.YAML()
+    #         config_args = file_yaml.load(f)
+    #         parser.set_defaults(**config_args)
     
-    # re-parse command-line args to overwrite with any command-line inputs
-    args = parser.parse_args()
+    # # re-parse command-line args to overwrite with any command-line inputs
+    # args = parser.parse_args()
     return args
     
     
@@ -125,6 +126,7 @@ def main():
     # TODO: use transform to normalize your images to [-1, 1]
     # TODO: you can also use horizontal flip
     transform = transforms.Compose([
+        transforms.Resize((args.image_size, args.image_size)),
         transforms.ToTensor(),
         transforms.Normalize([0.5] * 3, [0.5] * 3)  # Normalizes to [-1, 1]
     ])
