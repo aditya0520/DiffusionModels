@@ -90,7 +90,7 @@ class DDPMPipeline:
         image = randn_tensor(image_shape, generator=generator, device=device)
 
         # TODO: set step values using set_timesteps of scheduler
-        self.scheduler.set_timesteps(num_inference_steps=num_inference_steps, device=device)
+        self.scheduler.set_timesteps(num_inference_steps, device=device)
         
         # TODO: inverse diffusion process with for loop
         for t in self.progress_bar(self.scheduler.timesteps):
@@ -98,23 +98,23 @@ class DDPMPipeline:
             # NOTE: this is for CFG
             if guidance_scale is not None or guidance_scale != 1.0:
                 # TODO: implement cfg
-                model_input = torch.cat([image, image], dim=0) 
-                c = None 
+                model_input = torch.cat([image] * 2) 
+                c = torch.cat([uncond_embeds, class_embeds]) 
             else:
                 model_input = image 
                 # NOTE: leave c as None if you are not using CFG
                 c = None
             
             # TODO: 1. predict noise model_output
-            model_output = self.unet(model_input, c, t)
+            model_output = self.unet(model_input, t, c)
             
             if guidance_scale is not None or guidance_scale != 1.0:
                 # TODO: implement cfg
                 uncond_model_output, cond_model_output = model_output.chunk(2)
-                model_output = uncond_model_output + guidance_scale * (cond_model_output - uncond_model_output)
+                model_output = cond_model_output + guidance_scale * (cond_model_output - uncond_model_output)
             
             # TODO: 2. compute previous image: x_t -> x_t-1 using scheduler
-            image = self.scheduler.step(model_output, t, sample=image, generator=generator)
+            image = self.scheduler.step(model_output, t, image, generator=generator) 
             
         
         # NOTE: this is for latent DDPM
@@ -126,7 +126,7 @@ class DDPMPipeline:
             image = None 
         
         # TODO: return final image, re-scale to [0, 1]
-        image = (image + 1) / 2 
+        image = (image + 1) / 2  
         
         # convert to PIL images
         image = image.cpu().permute(0, 2, 3, 1).numpy()
