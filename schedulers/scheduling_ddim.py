@@ -32,12 +32,12 @@ class DDIMScheduler(DDPMScheduler):
         # TODO: calculate $beta_t$ for the current timestep using the cumulative product of alphas
         prev_t = self.previous_timestep(t)
         alpha_prod_t = self.alphas_cumprod[t]
-        alpha_prod_t_prev = self.alphas_cumprod[prev_t] if t > 0 else torch.tensor(1.0, device=alpha_prod_t.device) 
+        alpha_prod_t_prev = self.alphas_cumprod[prev_t] if prev_t >= 0 else torch.tensor(1.0, device=alpha_prod_t.device) 
         beta_prod_t = 1 - alpha_prod_t 
         beta_prod_t_prev = 1 - alpha_prod_t_prev 
         
         # TODO: DDIM equation for variance
-        variance = ((1 - alpha_prod_t_prev) / (1 - alpha_prod_t)) * (1 - alpha_prod_t / alpha_prod_t_prev) 
+        variance = (beta_prod_t_prev / beta_prod_t) * (1 - alpha_prod_t / alpha_prod_t_prev)
 
         return variance
     
@@ -89,15 +89,15 @@ class DDIMScheduler(DDPMScheduler):
         alpha_prod_t = self.alphas_cumprod[t]
         alpha_prod_t_prev = (
             self.alphas_cumprod[prev_t]
-            if t > 0
+            if prev_t >= 0
             else torch.tensor(1.0, device=alpha_prod_t.device, dtype=alpha_prod_t.dtype)
         )
-        beta_prod_t = None 
+        beta_prod_t = 1 - alpha_prod_t 
         
         # TODO: 2. compute predicted original sample from predicted noise also called
         # "predicted x_0" of formula (15) from https://arxiv.org/pdf/2006.11239.pdf
         if self.prediction_type == 'epsilon':
-            pred_original_sample = (sample - torch.sqrt(1 - alpha_prod_t) * model_output) / torch.sqrt(alpha_prod_t)
+            pred_original_sample = (sample - torch.sqrt(beta_prod_t) * model_output) / torch.sqrt(alpha_prod_t)
             pred_epsilon = model_output 
         else:
             raise NotImplementedError(f"Prediction type {self.prediction_type} not implemented.")
@@ -110,11 +110,11 @@ class DDIMScheduler(DDPMScheduler):
 
         # TODO: 4. compute variance: "sigma_t(η)" -> see formula (16)
         # σ_t = sqrt((1 − α_t−1)/(1 − α_t)) * sqrt(1 − α_t/α_t−1)
-        variance = (eta ** 2) * self._get_variance(t) 
-        std_dev_t = torch.sqrt(variance)
+        variance = self._get_variance(t) 
+        std_dev_t = eta * torch.sqrt(variance)
 
         # TODO: 5. compute "direction pointing to x_t" of formula (12) from https://arxiv.org/pdf/2010.02502.pdf
-        pred_sample_direction = torch.sqrt(1 - alpha_prod_t_prev - variance) * pred_epsilon
+        pred_sample_direction = torch.sqrt(1 - alpha_prod_t_prev - std_dev_t ** 2) * pred_epsilon
 
         # TODO: 6. compute x_t without "random noise" of formula (12) from https://arxiv.org/pdf/2010.02502.pdf
         prev_sample = torch.sqrt(alpha_prod_t_prev) * pred_original_sample + pred_sample_direction

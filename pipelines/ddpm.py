@@ -126,7 +126,7 @@ class DDPMPipeline:
             image = None 
         
         # TODO: return final image, re-scale to [0, 1]
-        image = (image + 1) / 2  
+        image = ((image + 1) / 2 ).clamp(0, 1)
         
         # convert to PIL images
         image = image.cpu().permute(0, 2, 3, 1).numpy()
