@@ -1,0 +1,16 @@
+{"time":"2024-11-07T23:16:04.757227413Z","level":"INFO","msg":"using version","core version":"0.18.6"}
+{"time":"2024-11-07T23:16:04.757271532Z","level":"INFO","msg":"created symlink","path":"/content/hw5_code/wandb/run-20241107_231604-vpgpfw0n/logs/debug-core.log"}
+{"time":"2024-11-07T23:16:04.860914751Z","level":"INFO","msg":"created new stream","id":"vpgpfw0n"}
+{"time":"2024-11-07T23:16:04.86095225Z","level":"INFO","msg":"stream: started","id":"vpgpfw0n"}
+{"time":"2024-11-07T23:16:04.861089635Z","level":"INFO","msg":"sender: started","stream_id":"vpgpfw0n"}
+{"time":"2024-11-07T23:16:04.860998795Z","level":"INFO","msg":"writer: Do: started","stream_id":{"value":"vpgpfw0n"}}
+{"time":"2024-11-07T23:16:04.861023041Z","level":"INFO","msg":"handler: started","stream_id":{"value":"vpgpfw0n"}}
+{"time":"2024-11-07T23:16:05.011819595Z","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-08T00:13:28.517546787Z","level":"INFO","msg":"stream: closing","id":"vpgpfw0n"}
+{"time":"2024-11-08T00:13:28.517584758Z","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-08T00:13:28.518162588Z","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-08T00:13:28.893900507Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2024-11-08T00:13:29.024468756Z","level":"INFO","msg":"handler: closed","stream_id":{"value":"vpgpfw0n"}}
+{"time":"2024-11-08T00:13:29.02452504Z","level":"INFO","msg":"writer: Close: closed","stream_id":{"value":"vpgpfw0n"}}
+{"time":"2024-11-08T00:13:29.024567396Z","level":"INFO","msg":"sender: closed","stream_id":"vpgpfw0n"}
+{"time":"2024-11-08T00:13:29.024660427Z","level":"INFO","msg":"stream: closed","id":"vpgpfw0n"}

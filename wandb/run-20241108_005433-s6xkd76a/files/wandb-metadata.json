@@ -1,0 +1,43 @@
+{
+  "os": "Linux-6.1.85+-x86_64-with-glibc2.35",
+  "python": "3.10.12",
+  "startedAt": "2024-11-08T00:54:33.471463Z",
+  "program": "/content/hw5_code/train.py",
+  "codePath": "train.py",
+  "git": {
+    "remote": "https://github.com/aditya0520/DiffusionModels.git",
+    "commit": "04849f3040fb2be39eb6a11f6c9517d9cf22b057"
+  },
+  "email": "aaayush@andrew.cmu.edu",
+  "root": "/content/hw5_code",
+  "host": "6305f1fd4a3b",
+  "username": "root",
+  "executable": "/usr/bin/python3",
+  "codePathLocal": "train.py",
+  "cpu_count": 2,
+  "cpu_count_logical": 4,
+  "gpu": "NVIDIA L4",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "206900334592",
+      "used": "38415663104"
+    }
+  },
+  "memory": {
+    "total": "16779812864"
+  },
+  "cpu": {
+    "count": 2,
+    "countLogical": 4
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA L4",
+      "memoryTotal": "24152899584",
+      "cudaCores": 7424,
+      "architecture": "Ada"
+    }
+  ],
+  "cudaVersion": "12.2"
+}

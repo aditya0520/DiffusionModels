@@ -1,0 +1,35 @@
+11/07/2024 23:06:10 - INFO - __main__ - ***** Training arguments *****
+11/07/2024 23:06:10 - INFO - __main__ - Namespace(config='configs/ddpm.yaml', data_dir='./data/imagenet100_128x128/train', image_size=128, batch_size=4, num_workers=8, num_classes=100, run_name='exp-2', output_dir='experiments', num_epochs=10, learning_rate=0.0001, weight_decay=0.0001, grad_clip=1.0, seed=42, mixed_precision='none', num_train_timesteps=1000, num_inference_steps=200, beta_start=0.0002, beta_end=0.02, beta_schedule='linear', variance_type='fixed_small', prediction_type='epsilon', clip_sample=True, clip_sample_range=1.0, unet_in_size=128, unet_in_ch=3, unet_ch=128, unet_ch_mult=[1, 2, 2, 2], unet_attn=[1, 2, 3], unet_num_res_blocks=2, unet_dropout=0.0, latent_ddpm=False, use_cfg=False, cfg_guidance_scale=2.0, use_ddim=False, ckpt='./checkpoint', distributed=False, world_size=1, rank=0, local_rank=0, device='cuda', total_batch_size=4, max_train_steps=325000)
+11/07/2024 23:06:10 - INFO - __main__ - ***** Running training *****
+11/07/2024 23:06:10 - INFO - __main__ -   Num examples = 130000
+11/07/2024 23:06:10 - INFO - __main__ -   Num Epochs = 10
+11/07/2024 23:06:10 - INFO - __main__ -   Instantaneous batch size per device = 4
+11/07/2024 23:06:10 - INFO - __main__ -   Total train batch size (w. parallel, distributed & accumulation) = 4
+11/07/2024 23:06:10 - INFO - __main__ -   Total optimization steps per epoch 32500
+11/07/2024 23:06:10 - INFO - __main__ -   Total optimization steps = 325000
+  0% 0/325000 [00:00<?, ?it/s]11/07/2024 23:06:10 - INFO - __main__ - Epoch 1/10
+/usr/local/lib/python3.10/dist-packages/torch/utils/data/dataloader.py:557: UserWarning: This DataLoader will create 8 worker processes in total. Our suggested max number of worker in current system is 4, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+  0% 1/325000 [00:02<246:38:02,  2.73s/it]11/07/2024 23:06:13 - INFO - __main__ - Epoch 1/10, Step 0/32500, Loss 0.9951373338699341 (0.9951373338699341)
+  0% 101/325000 [00:41<35:11:23,  2.56it/s]11/07/2024 23:06:51 - INFO - __main__ - Epoch 1/10, Step 100/32500, Loss 0.4061342477798462 (0.7295303896512135)
+  0% 201/325000 [01:20<36:06:17,  2.50it/s]11/07/2024 23:07:31 - INFO - __main__ - Epoch 1/10, Step 200/32500, Loss 0.03577588498592377 (0.45935826389054163)
+  0% 301/325000 [02:01<37:11:03,  2.43it/s]11/07/2024 23:08:11 - INFO - __main__ - Epoch 1/10, Step 300/32500, Loss 0.03339361399412155 (0.32239671210538706)
+  0% 401/325000 [02:43<38:23:01,  2.35it/s]11/07/2024 23:08:53 - INFO - __main__ - Epoch 1/10, Step 400/32500, Loss 0.007823485881090164 (0.25112571830436253)
+  0% 501/325000 [03:25<37:49:37,  2.38it/s]11/07/2024 23:09:36 - INFO - __main__ - Epoch 1/10, Step 500/32500, Loss 0.011683783493936062 (0.20736669155047785)
+  0% 601/325000 [04:07<38:04:01,  2.37it/s]11/07/2024 23:10:18 - INFO - __main__ - Epoch 1/10, Step 600/32500, Loss 0.01713467203080654 (0.17766752698731464)
+  0% 701/325000 [04:50<38:05:19,  2.37it/s]11/07/2024 23:11:00 - INFO - __main__ - Epoch 1/10, Step 700/32500, Loss 0.020918970927596092 (0.15689418265747487)
+  0% 801/325000 [05:32<37:51:29,  2.38it/s]11/07/2024 23:11:42 - INFO - __main__ - Epoch 1/10, Step 800/32500, Loss 0.012483937665820122 (0.1409494148246995)
+  0% 901/325000 [06:14<38:05:25,  2.36it/s]11/07/2024 23:12:24 - INFO - __main__ - Epoch 1/10, Step 900/32500, Loss 0.007214905694127083 (0.128393241082867)
+  0% 1001/325000 [06:56<37:45:47,  2.38it/s]11/07/2024 23:13:07 - INFO - __main__ - Epoch 1/10, Step 1000/32500, Loss 0.007822273299098015 (0.11854148278204532)
+  0% 1028/325000 [07:08<38:00:05,  2.37it/s]Traceback (most recent call last):
+  File "/content/hw5_code/train.py", line 396, in <module>
+    main()
+  File "/content/hw5_code/train.py", line 347, in main
+    loss.backward()
+  File "/usr/local/lib/python3.10/dist-packages/torch/_tensor.py", line 521, in backward
+    torch.autograd.backward(
+  File "/usr/local/lib/python3.10/dist-packages/torch/autograd/__init__.py", line 289, in backward
+    _engine_run_backward(
+  File "/usr/local/lib/python3.10/dist-packages/torch/autograd/graph.py", line 769, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+KeyboardInterrupt

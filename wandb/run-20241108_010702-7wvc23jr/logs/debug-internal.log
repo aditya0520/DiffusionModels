@@ -1,0 +1,8 @@
+{"time":"2024-11-08T01:07:02.600960337Z","level":"INFO","msg":"using version","core version":"0.18.6"}
+{"time":"2024-11-08T01:07:02.600986876Z","level":"INFO","msg":"created symlink","path":"/content/hw5_code/wandb/run-20241108_010702-7wvc23jr/logs/debug-core.log"}
+{"time":"2024-11-08T01:07:02.704544901Z","level":"INFO","msg":"created new stream","id":"7wvc23jr"}
+{"time":"2024-11-08T01:07:02.704583775Z","level":"INFO","msg":"stream: started","id":"7wvc23jr"}
+{"time":"2024-11-08T01:07:02.704672431Z","level":"INFO","msg":"sender: started","stream_id":"7wvc23jr"}
+{"time":"2024-11-08T01:07:02.704668355Z","level":"INFO","msg":"handler: started","stream_id":{"value":"7wvc23jr"}}
+{"time":"2024-11-08T01:07:02.704690518Z","level":"INFO","msg":"writer: Do: started","stream_id":{"value":"7wvc23jr"}}
+{"time":"2024-11-08T01:07:02.881138926Z","level":"INFO","msg":"Starting system monitor"}

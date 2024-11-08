@@ -1,0 +1,17 @@
+{"time":"2024-11-08T00:33:29.599201154Z","level":"INFO","msg":"using version","core version":"0.18.6"}
+{"time":"2024-11-08T00:33:29.599231112Z","level":"INFO","msg":"created symlink","path":"/content/hw5_code/wandb/run-20241108_003329-vfk6a17s/logs/debug-core.log"}
+{"time":"2024-11-08T00:33:29.703133924Z","level":"INFO","msg":"created new stream","id":"vfk6a17s"}
+{"time":"2024-11-08T00:33:29.703182145Z","level":"INFO","msg":"stream: started","id":"vfk6a17s"}
+{"time":"2024-11-08T00:33:29.703269827Z","level":"INFO","msg":"sender: started","stream_id":"vfk6a17s"}
+{"time":"2024-11-08T00:33:29.703241568Z","level":"INFO","msg":"handler: started","stream_id":{"value":"vfk6a17s"}}
+{"time":"2024-11-08T00:33:29.703222766Z","level":"INFO","msg":"writer: Do: started","stream_id":{"value":"vfk6a17s"}}
+{"time":"2024-11-08T00:33:29.866107018Z","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-08T00:33:46.8028938Z","level":"INFO","msg":"stream: closing","id":"vfk6a17s"}
+{"time":"2024-11-08T00:33:46.802926965Z","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-08T00:33:46.803546473Z","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-08T00:33:47.210404238Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2024-11-08T00:33:47.299408774Z","level":"INFO","msg":"handler: closed","stream_id":{"value":"vfk6a17s"}}
+{"time":"2024-11-08T00:33:47.299457486Z","level":"INFO","msg":"sender: closed","stream_id":"vfk6a17s"}
+{"time":"2024-11-08T00:33:47.299439495Z","level":"INFO","msg":"writer: Close: closed","stream_id":{"value":"vfk6a17s"}}
+{"time":"2024-11-08T00:33:47.299479931Z","level":"ERROR","msg":"runfiles: CreateRunFiles returned error: api: failed sending: POST https://api.wandb.ai/graphql giving up after 1 attempt(s): context canceled"}
+{"time":"2024-11-08T00:33:47.299557765Z","level":"INFO","msg":"stream: closed","id":"vfk6a17s"}
