@@ -105,7 +105,7 @@ class DDPMScheduler(nn.Module):
         )
         # TODO: caluclate previous timestep
         step_size = self.num_train_timesteps // num_inference_steps
-        prev_t = max(timestep - step_size, 0)
+        prev_t = timestep - step_size
         return prev_t
 
     
@@ -124,8 +124,8 @@ class DDPMScheduler(nn.Module):
         # TODO: calculate $beta_t$ for the current timestep using the cumulative product of alphas
         prev_t = self.previous_timestep(t) 
         alpha_prod_t = self.alphas_cumprod[t] 
-        alpha_prod_t_prev =  self.alphas_cumprod[prev_t] if t > 0 else torch.tensor(1.0, device=alpha_prod_t.device) 
-        current_beta_t = self.betas[t] 
+        alpha_prod_t_prev =  self.alphas_cumprod[prev_t] if prev_t >= 0 else torch.tensor(1.0, device=alpha_prod_t.device) 
+        current_beta_t = 1 - alpha_prod_t / alpha_prod_t_prev
     
         # TODO: For t > 0, compute predicted variance $\beta_t$ (see formula (6) and (7) from https://arxiv.org/pdf/2006.11239.pdf)
         # and sample from it to get previous sample
@@ -140,10 +140,10 @@ class DDPMScheduler(nn.Module):
         # 2. fixed_large: $\sigma_t^2 = \beta$, this one is optimal for $x_0 \sim mathcal{N}(0, 1)$
         if self.variance_type == "fixed_small":
             # TODO: fixed small variance
-            variance = current_beta_t
+            variance = variance
         elif self.variance_type == "fixed_large":
             # TODO: fixed large variance
-            variance = variance 
+            variance = current_beta_t 
             # TODO: small hack: set the initial (log-)variance like so to get a better decoder log likelihood.
             if t == 1:
                 variance = variance
@@ -227,16 +227,16 @@ class DDPMScheduler(nn.Module):
         
         # TODO: 1. compute alphas, betas
         alpha_prod_t = self.alphas_cumprod[t] 
-        alpha_prod_t_prev = self.alphas_cumprod[prev_t] 
-        beta_prod_t = self.betas[t] 
-        beta_prod_t_prev = self.betas[prev_t] 
-        current_alpha_t = alpha_prod_t 
-        current_beta_t = beta_prod_t 
+        alpha_prod_t_prev = self.alphas_cumprod[prev_t] if prev_t >= 0 else torch.tensor(1.0, device=alpha_prod_t.device) 
+        beta_prod_t = 1 - alpha_prod_t
+        beta_prod_t_prev = 1 - alpha_prod_t_prev
+        current_alpha_t = alpha_prod_t / alpha_prod_t_prev 
+        current_beta_t = 1 - current_alpha_t 
         
         # TODO: 2. compute predicted original sample from predicted noise also called
         # "predicted x_0" of formula (15) from https://arxiv.org/pdf/2006.11239.pdf
         if self.prediction_type == 'epsilon':
-            pred_original_sample = (sample - torch.sqrt(1 - current_alpha_t) * model_output) / torch.sqrt(current_alpha_t) 
+            pred_original_sample = (sample - torch.sqrt(beta_prod_t) * model_output) / torch.sqrt(alpha_prod_t) 
         else:
             raise NotImplementedError(f"Prediction type {self.prediction_type} not implemented.")
 
@@ -248,8 +248,8 @@ class DDPMScheduler(nn.Module):
 
         # TODO: 4. Compute coefficients for pred_original_sample x_0 and current sample x_t
         # See formula (7) from https://arxiv.org/pdf/2006.11239.pdf
-        pred_original_sample_coeff = torch.sqrt(alpha_prod_t_prev) * beta_prod_t / (1 - alpha_prod_t)
-        current_sample_coeff = torch.sqrt(alpha_prod_t) * (1 - alpha_prod_t_prev) / (1 - alpha_prod_t)
+        pred_original_sample_coeff = torch.sqrt(alpha_prod_t_prev) * current_beta_t / (1 - alpha_prod_t_prev)
+        current_sample_coeff = torch.sqrt(current_alpha_t) * (1 - alpha_prod_t_prev) / (1 - alpha_prod_t_prev)
 
         # 5. Compute predicted previous sample µ_t
         # See formula (7) from https://arxiv.org/pdf/2006.11239.pdf
