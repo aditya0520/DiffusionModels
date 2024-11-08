@@ -15,6 +15,7 @@ import torch.nn.functional as F
 
 from torchvision import datasets, transforms
 from torchvision.utils  import make_grid
+from torch.cuda.amp import GradScaler, autocast
 
 from models import UNet, VAE, ClassEmbedder
 from schedulers import DDPMScheduler, DDIMScheduler
@@ -99,6 +100,8 @@ def parse_args():
     
 def main():
     
+
+    scaler = GradScaler()
     # parse arguments
     args = parse_args()
     
@@ -353,26 +356,28 @@ def main():
             # TODO: add noise to images using scheduler
             noisy_images = scheduler.add_noise(images, noise, timesteps) 
             
-            # TODO: model prediction
-            model_pred = unet(noisy_images, timesteps, c=class_emb) 
-            
-            if args.prediction_type == 'epsilon':
-                target = noise 
-            
-            # TODO: calculate loss
-            loss = F.mse_loss(model_pred, target) 
+            with autocast():  # Use mixed precision
+                model_pred = unet(noisy_images, timesteps, c=class_emb)
+                
+                if args.prediction_type == 'epsilon':
+                    target = noise
+                
+                # Calculate loss
+                loss = F.mse_loss(model_pred, target)
             
             # record loss
             loss_m.update(loss.item())
             
             # backward and step 
-            loss.backward()
+            scaler.scale(loss).backward()
             # TODO: grad clip
             if args.grad_clip:
+                scaler.unscale_(optimizer)
                 torch.nn.utils.clip_grad_norm_(unet.parameters(), args.grad_clip) 
             
             # TODO: step your optimizer
-            optimizer.step()
+            scaler.step(optimizer)
+            scaler.update()
             
             progress_bar.update(1)
             
