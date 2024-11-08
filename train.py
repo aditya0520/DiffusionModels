@@ -9,6 +9,8 @@ import logging
 from logging import getLogger as get_logger
 from tqdm import tqdm 
 from PIL import Image
+from torch.utils.data import Subset
+from collections import defaultdict
 import torch.nn.functional as F
 
 from torchvision import datasets, transforms
@@ -131,8 +133,28 @@ def main():
         transforms.Normalize([0.5] * 3, [0.5] * 3)  # Normalizes to [-1, 1]
     ])
     # TOOD: use image folder for your train dataset
-    train_dataset = datasets.ImageFolder(root=args.data_dir, transform=transform) 
-    
+    train_dataset = datasets.CIFAR10(root='./data', 
+                                      train=True, 
+                                      download=False,
+                                      transform=transform)
+    '''
+    # # Number of images per class you want, e.g., 500 images per class
+    # num_images_per_class = 10
+    # num_classes = 10  # CIFAR-10 has 10 classes
+
+    # # Organize indices by class
+    # class_indices = defaultdict(list)
+    # for idx, (data, label) in enumerate(full_train_dataset):
+    #     class_indices[label].append(idx)
+
+    # # Create subset indices by taking `num_images_per_class` samples from each class
+    # subset_indices = []
+    # for class_label, indices in class_indices.items():
+    #     subset_indices.extend(np.random.choice(indices, num_images_per_class, replace=False))
+
+    # # Create the subset dataset
+    # train_dataset = Subset(full_train_dataset, subset_indices)
+    '''
     # TODO: setup dataloader
     sampler = None 
     if args.distributed:
@@ -229,6 +251,7 @@ def main():
     if args.use_ddim:
         scheduler_wo_ddp = DDIMScheduler(
         num_train_timesteps=args.num_train_timesteps,
+        num_inference_steps=args.num_inference_steps,
         beta_start=args.beta_start,
         beta_end=args.beta_end,
         beta_schedule=args.beta_schedule
@@ -241,10 +264,9 @@ def main():
     pipeline = DDPMPipeline(
     unet=unet_wo_ddp,
     scheduler=scheduler_wo_ddp,
-    vae=vae_wo_ddp,
+    vae=None,
     class_embedder=class_embedder_wo_ddp
 )
-    
     
     # dump config file
     if is_primary(args):
@@ -273,7 +295,7 @@ def main():
         logger.info(f"  Total optimization steps per epoch {num_update_steps_per_epoch}")
         logger.info(f"  Total optimization steps = {args.max_train_steps}")
     # Only show the progress bar once on each machine.
-    progress_bar = tqdm(range(args.max_train_steps), disable=not is_primary(args))
+    progress_bar = tqdm(range(args.max_train_steps), disable=not is_primary(args), leave=False)
 
     # training
     for epoch in range(args.num_epochs):

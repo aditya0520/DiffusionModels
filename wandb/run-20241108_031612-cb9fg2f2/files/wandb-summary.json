@@ -1,0 +1,1 @@
+{"loss":0.26839780807495117,"_timestamp":1.7310364605868042e+09,"_runtime":688.402489902,"_step":19,"gen_images":{"path":"media/images/gen_images_19_40b38bc79f5f8889e9b8.png","format":"png","width":512,"height":128,"_type":"image-file","sha256":"40b38bc79f5f8889e9b8eebd08f1603304ac8c16c6a5e0baaddd15789b7e499f","size":85893},"_wandb":{"runtime":689}}
