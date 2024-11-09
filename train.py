@@ -201,7 +201,7 @@ def main():
     
     # TODO: ddpm shceduler
     scheduler = DDPMScheduler(
-        num_train_timesteps=args.num_train_timesteps, num_inference_steps=args.num_inference_steps, beta_start=args.beta_start, 
+        num_train_timesteps=args.num_train_timesteps, beta_start=args.beta_start, 
         beta_end=args.beta_end, beta_schedule=args.beta_schedule, variance_type=args.variance_type, 
         prediction_type=args.prediction_type, clip_sample=args.clip_sample, clip_sample_range=args.clip_sample_range
     )
@@ -260,6 +260,7 @@ def main():
         beta_schedule=args.beta_schedule
     )
     else:
+        args.num_inference_steps = args.num_train_timesteps
         scheduler_wo_ddp = scheduler
     
     # TODO: setup evaluation pipeline
