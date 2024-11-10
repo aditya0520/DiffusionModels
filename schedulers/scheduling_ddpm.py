@@ -82,8 +82,8 @@ class DDPMScheduler(nn.Module):
             
         # TODO: set timesteps
         step_size = self.num_train_timesteps // num_inference_steps
-        timesteps = np.arange(0, self.num_train_timesteps, step_size)
-        self.timesteps = torch.from_numpy(timesteps).to(device)
+        timesteps = np.arange(0, self.num_train_timesteps, step_size)[::-1]
+        self.timesteps = torch.from_numpy(timesteps.copy()).to(device)
 
 
     def __len__(self):
@@ -254,7 +254,6 @@ class DDPMScheduler(nn.Module):
         # 5. Compute predicted previous sample µ_t
         # See formula (7) from https://arxiv.org/pdf/2006.11239.pdf
         pred_prev_sample = pred_original_sample_coeff * pred_original_sample + current_sample_coeff * sample
-
 
         # 6. Add noise
         variance = 0
