@@ -62,7 +62,7 @@ def parse_args():
     parser.add_argument("--clip_sample_range", type=float, default=1.0, help="clip sample range")
     
     # unet
-    parser.add_argument("--unet_in_size", type=int, default=128, help="unet input image size")
+    parser.add_argument("--unet_in_size", type=int, default=32, help="unet input image size")
     parser.add_argument("--unet_in_ch", type=int, default=3, help="unet input channel size")
     parser.add_argument("--unet_ch", type=int, default=128, help="unet channel size")
     parser.add_argument("--unet_ch_mult", type=int, default=[1, 2, 2, 2], nargs='+', help="unet channel multiplier")
