@@ -236,10 +236,10 @@ def main():
     args.max_train_steps = args.num_epochs * num_update_steps_per_epoch
 
     # TODO: setup scheduler
-    lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+    lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(
     optimizer,
-    T_max=args.max_train_steps  # Number of epochs to complete a cycle
-    )
+    gamma=0.99
+)
     
     #  setup distributed training
     if args.distributed:
@@ -328,6 +328,7 @@ def main():
         for step, (images, labels) in enumerate(train_loader):
             
             batch_size = images.size(0)
+            current_lr = optimizer.param_groups[0]['lr']
             
             # TODO: send to device
             images = images.to(device) 
@@ -391,6 +392,7 @@ def main():
             if step % 100 == 0 and is_primary(args):
                 logger.info(f"Epoch {epoch+1}/{args.num_epochs}, Step {step}/{num_update_steps_per_epoch}, Loss {loss.item()} ({loss_m.avg})")
                 wandb_logger.log({'loss': loss_m.avg})
+                wandb_logger.log({'lr': current_lr})
 
         # validation
         # send unet to evaluation mode
