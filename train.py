@@ -45,7 +45,7 @@ def parse_args():
     parser.add_argument("--output_dir", type=str, default="experiments", help="output folder")
     parser.add_argument("--num_epochs", type=int, default=10)
     parser.add_argument("--learning_rate", type=float, default=1e-4, help="learning rate")
-    parser.add_argument("--weight_decay", type=float, default=1e-4, help="weight decay")
+    parser.add_argument("--weight_decay", type=float, default=1e-2, help="weight decay")
     parser.add_argument("--grad_clip", type=float, default=1.0, help="gradient clip")
     parser.add_argument("--seed", type=int, default=42, help="random seed")
     parser.add_argument("--mixed_precision", type=str, default='none', choices=['fp16', 'bf16', 'fp32', 'none'], help='mixed precision')
@@ -236,10 +236,10 @@ def main():
     args.max_train_steps = args.num_epochs * num_update_steps_per_epoch
 
     # TODO: setup scheduler
-    lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(
-    optimizer,
-    gamma=0.99
-)
+    lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+        optimizer,
+        T_max=args.max_train_steps 
+    )
     
     #  setup distributed training
     if args.distributed:
