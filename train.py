@@ -45,7 +45,7 @@ def parse_args():
     parser.add_argument("--output_dir", type=str, default="experiments", help="output folder")
     parser.add_argument("--num_epochs", type=int, default=10)
     parser.add_argument("--learning_rate", type=float, default=1e-4, help="learning rate")
-    parser.add_argument("--weight_decay", type=float, default=1e-2, help="weight decay")
+    parser.add_argument("--weight_decay", type=float, default=1e-4, help="weight decay")
     parser.add_argument("--grad_clip", type=float, default=1.0, help="gradient clip")
     parser.add_argument("--seed", type=int, default=42, help="random seed")
     parser.add_argument("--mixed_precision", type=str, default='none', choices=['fp16', 'bf16', 'fp32', 'none'], help='mixed precision')
@@ -238,7 +238,7 @@ def main():
     # TODO: setup scheduler
     lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
         optimizer,
-        T_max=args.max_train_steps 
+        T_max=args.num_epochs  # Replace num_epochs with the number of epochs after which the learning rate resets
     )
     
     #  setup distributed training
@@ -384,7 +384,6 @@ def main():
             # TODO: step your optimizer
             scaler.step(optimizer)
             scaler.update()
-            lr_scheduler.step()
             
             progress_bar.update(1)
             
@@ -392,7 +391,9 @@ def main():
             if step % 100 == 0 and is_primary(args):
                 logger.info(f"Epoch {epoch+1}/{args.num_epochs}, Step {step}/{num_update_steps_per_epoch}, Loss {loss.item()} ({loss_m.avg})")
                 wandb_logger.log({'loss': loss_m.avg})
-                wandb_logger.log({'lr': current_lr})
+        
+        wandb_logger.log({'lr': current_lr})
+        lr_scheduler.step()
 
         # validation
         # send unet to evaluation mode
