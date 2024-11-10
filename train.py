@@ -230,12 +230,16 @@ def main():
     
     # TODO: setup optimizer
     optimizer = torch.optim.AdamW(unet.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay) 
-    # TODO: setup scheduler
-    # scheduler = None 
     
     # max train steps
     num_update_steps_per_epoch = len(train_loader)
     args.max_train_steps = args.num_epochs * num_update_steps_per_epoch
+
+    # TODO: setup scheduler
+    lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+    optimizer,
+    T_max=args.max_train_steps  # Number of epochs to complete a cycle
+    )
     
     #  setup distributed training
     if args.distributed:
@@ -379,6 +383,7 @@ def main():
             # TODO: step your optimizer
             scaler.step(optimizer)
             scaler.update()
+            lr_scheduler.step()
             
             progress_bar.update(1)
             
