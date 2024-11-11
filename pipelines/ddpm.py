@@ -37,14 +37,15 @@ class DDPMPipeline:
 
         return pil_images
 
-    def progress_bar(self, iterable=None, total=None):
+    def progress_bar(self, iterable=None, total=None, leave=True):
         if not hasattr(self, "_progress_bar_config"):
             self._progress_bar_config = {}
         elif not isinstance(self._progress_bar_config, dict):
             raise ValueError(
                 f"`self._progress_bar_config` should be of type `dict`, but is {type(self._progress_bar_config)}."
             )
-
+        
+        self._progress_bar_config['leave'] = leave
         if iterable is not None:
             return tqdm(iterable, **self._progress_bar_config)
         elif total is not None:
@@ -93,7 +94,7 @@ class DDPMPipeline:
         self.scheduler.set_timesteps(num_inference_steps, device=device)
         
         # TODO: inverse diffusion process with for loop
-        for t in self.progress_bar(self.scheduler.timesteps):
+        for t in self.progress_bar(self.scheduler.timesteps, leave=False):
 
             
             # NOTE: this is for CFG

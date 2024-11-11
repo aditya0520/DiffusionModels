@@ -54,7 +54,7 @@ class DDPMScheduler(nn.Module):
         self.register_buffer("alphas_cumprod", alphas_cumprod)
         
         # TODO: timesteps
-        timesteps = torch.arange(self.num_train_timesteps, dtype=torch.long)
+        timesteps = torch.arange(self.num_train_timesteps - 1, -1, -1, dtype=torch.long)
         self.register_buffer("timesteps", timesteps)
         
 
@@ -182,11 +182,13 @@ class DDPMScheduler(nn.Module):
         
         # TODO: get sqrt alphas
         sqrt_alpha_prod = torch.sqrt(alphas_cumprod[timesteps]) 
+        sqrt_alpha_prod = sqrt_alpha_prod.flatten()
         while len(sqrt_alpha_prod.shape) < len(original_samples.shape):
             sqrt_alpha_prod = sqrt_alpha_prod.unsqueeze(-1)
             
         # TODO: get sqrt one miucs alphas
         sqrt_one_minus_alpha_prod = torch.sqrt(1 - alphas_cumprod[timesteps])
+        sqrt_one_minus_alpha_prod = sqrt_one_minus_alpha_prod.flatten()
         while len(sqrt_one_minus_alpha_prod.shape) < len(original_samples.shape):
             sqrt_one_minus_alpha_prod = sqrt_one_minus_alpha_prod.unsqueeze(-1)
         
