@@ -35,7 +35,7 @@ def parse_args():
 
     # data 
     parser.add_argument("--data_dir", type=str, default='./data/imagenet100_128x128/train', help="data folder") 
-    parser.add_argument("--image_size", type=int, default=32, help="image size")
+    parser.add_argument("--image_size", type=int, default=128, help="image size")
     parser.add_argument("--batch_size", type=int, default=8, help="per gpu batch size")
     parser.add_argument("--num_workers", type=int, default=8, help="batch size")
     parser.add_argument("--num_classes", type=int, default=100, help="number of classes in dataset")
@@ -62,7 +62,7 @@ def parse_args():
     parser.add_argument("--clip_sample_range", type=float, default=1.0, help="clip sample range")
     
     # unet
-    parser.add_argument("--unet_in_size", type=int, default=32, help="unet input image size")
+    parser.add_argument("--unet_in_size", type=int, default=128, help="unet input image size")
     parser.add_argument("--unet_in_ch", type=int, default=3, help="unet input channel size")
     parser.add_argument("--unet_ch", type=int, default=128, help="unet channel size")
     parser.add_argument("--unet_ch_mult", type=int, default=[1, 2, 2, 2], nargs='+', help="unet channel multiplier")
@@ -136,28 +136,8 @@ def main():
         transforms.Normalize([0.5] * 3, [0.5] * 3)  # Normalizes to [-1, 1]
     ])
     # TOOD: use image folder for your train dataset
-    train_dataset = datasets.CIFAR10(root='./data', 
-                                      train=True, 
-                                      download=False,
-                                      transform=transform)
-    '''
-    # # Number of images per class you want, e.g., 500 images per class
-    # num_images_per_class = 10
-    # num_classes = 10  # CIFAR-10 has 10 classes
+    train_dataset = datasets.ImageFolder(root=args.data_dir, transform=transform)
 
-    # # Organize indices by class
-    # class_indices = defaultdict(list)
-    # for idx, (data, label) in enumerate(full_train_dataset):
-    #     class_indices[label].append(idx)
-
-    # # Create subset indices by taking `num_images_per_class` samples from each class
-    # subset_indices = []
-    # for class_label, indices in class_indices.items():
-    #     subset_indices.extend(np.random.choice(indices, num_images_per_class, replace=False))
-
-    # # Create the subset dataset
-    # train_dataset = Subset(full_train_dataset, subset_indices)
-    '''
     # TODO: setup dataloader
     sampler = None 
     if args.distributed:
@@ -338,7 +318,7 @@ def main():
             # NOTE: this is for latent DDPM 
             if vae is not None:
                 # use vae to encode images as latents
-                images = vae.encode(image) 
+                images = vae.encode(images) 
                 # NOTE: do not change  this line, this is to ensure the latent has unit std
                 images = images * 0.1845
             
