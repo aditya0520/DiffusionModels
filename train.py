@@ -272,7 +272,7 @@ def main():
     pipeline = DDPMPipeline(
     unet=unet_wo_ddp,
     scheduler=scheduler_wo_ddp,
-    vae=None,
+    vae=vae,
     class_embedder=class_embedder_wo_ddp
 )
     
@@ -338,7 +338,7 @@ def main():
             # NOTE: this is for latent DDPM 
             if vae is not None:
                 # use vae to encode images as latents
-                images = None 
+                images = vae.encode(image) 
                 # NOTE: do not change  this line, this is to ensure the latent has unit std
                 images = images * 0.1845
             

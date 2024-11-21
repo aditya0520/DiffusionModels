@@ -29,8 +29,9 @@ class VAE(nn.Module):
     @torch.no_grad()
     def encode(self, x):
         # TODO: Implemente the encode function transforms images into a sampled vector from
-        h = None
-        moments = None 
+        h = self.encoder(x)
+        mu, log_var = torch.chunk(h, 2, dim=1)
+        moments = (mu, log_var) 
         
         # sample from Gaussian using re-parameterization trick
         posterior = DiagonalGaussianDistribution(moments)
@@ -40,8 +41,7 @@ class VAE(nn.Module):
     @torch.no_grad()
     def decode(self, z):
         # TODO: reconstruct images from latent
-        z = None 
-        dec = None
+        dec = self.decoder(z)
         return dec
 
     def init_from_ckpt(self, path, ignore_keys=list()):
