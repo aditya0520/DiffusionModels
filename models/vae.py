@@ -30,17 +30,16 @@ class VAE(nn.Module):
     def encode(self, x):
         # TODO: Implemente the encode function transforms images into a sampled vector from
         h = self.encoder(x)
-        mu, log_var = torch.chunk(h, 2, dim=1)
-        moments = (mu, log_var) 
-        
+        monments = self.quant_conv(h)
         # sample from Gaussian using re-parameterization trick
-        posterior = DiagonalGaussianDistribution(moments)
+        posterior = DiagonalGaussianDistribution(monments)
         posterior = posterior.sample()
         return posterior
 
     @torch.no_grad()
     def decode(self, z):
         # TODO: reconstruct images from latent
+        z = self.post_quant_conv(z)
         dec = self.decoder(z)
         return dec
 
