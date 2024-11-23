@@ -48,6 +48,7 @@ def parse_args():
     parser.add_argument("--weight_decay", type=float, default=1e-4, help="weight decay")
     parser.add_argument("--grad_clip", type=float, default=1.0, help="gradient clip")
     parser.add_argument("--seed", type=int, default=42, help="random seed")
+    parser.add_argument("--distributed", type=str2bool, default=False, help="Distributed Training")
     parser.add_argument("--mixed_precision", type=str, default='none', choices=['fp16', 'bf16', 'fp32', 'none'], help='mixed precision')
     
     # ddpm
@@ -136,7 +137,15 @@ def main():
         transforms.Normalize([0.5] * 3, [0.5] * 3)  # Normalizes to [-1, 1]
     ])
     # TOOD: use image folder for your train dataset
-    train_dataset = datasets.ImageFolder(root=args.data_dir, transform=transform)
+    # train_dataset = datasets.ImageFolder(root=args.data_dir, transform=transform)
+
+    train_dataset = datasets.CIFAR10(
+    root='./data',  # Directory to save the dataset
+    train=True,  # True for training data
+    download=True,  # Download the dataset if not already downloaded
+    transform=transform  # Apply transformations
+)
+
 
     # TODO: setup dataloader
     sampler = None 
@@ -230,6 +239,8 @@ def main():
             class_embedder = torch.nn.parallel.DistributedDataParallel(
                 class_embedder, device_ids=[args.device], output_device=args.device, find_unused_parameters=False)
             class_embedder_wo_ddp = class_embedder.module
+        else:
+            class_embedder_wo_ddp = None
     else:
         unet_wo_ddp = unet
         class_embedder_wo_ddp = class_embedder
@@ -322,6 +333,8 @@ def main():
                 # NOTE: do not change  this line, this is to ensure the latent has unit std
                 images = images * 0.1845
             
+            assert torch.isfinite(images).all(), "NaN or Inf detected in latent encoding!"
+            
             # TODO: zero grad optimizer
             optimizer.zero_grad()
             
@@ -341,18 +354,24 @@ def main():
             
             # TODO: add noise to images using scheduler
             noisy_images = scheduler.add_noise(images, noise, timesteps) 
+
+            assert torch.isfinite(noisy_images).all(), "NaN or Inf detected in noisy images!"
             
-            with autocast():  # Use mixed precision
+            with autocast(dtype=torch.bfloat16):  # Use mixed precision
                 model_pred = unet(noisy_images, timesteps, c=class_emb)
                 
                 if args.prediction_type == 'epsilon':
                     target = noise
                 
+                assert torch.isfinite(model_pred).all(), "NaN or Inf detected in model predictions!"
                 # Calculate loss
                 loss = F.mse_loss(model_pred, target)
+
             
             # record loss
             loss_m.update(loss.item())
+            if not torch.isfinite(loss) or torch.isnan(loss):
+              print(f"Warning: Loss is infinite or nan")
             
             # backward and step 
             scaler.scale(loss).backward()
