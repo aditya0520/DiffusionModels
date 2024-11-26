@@ -36,7 +36,7 @@ def parse_args():
     # data 
     parser.add_argument("--data_dir", type=str, default='./data/imagenet100_128x128/train', help="data folder") 
     parser.add_argument("--image_size", type=int, default=128, help="image size")
-    parser.add_argument("--batch_size", type=int, default=8, help="per gpu batch size")
+    parser.add_argument("--batch_size", type=int, default=16, help="per gpu batch size")
     parser.add_argument("--num_workers", type=int, default=8, help="batch size")
     parser.add_argument("--num_classes", type=int, default=100, help="number of classes in dataset")
 
@@ -48,7 +48,6 @@ def parse_args():
     parser.add_argument("--weight_decay", type=float, default=1e-4, help="weight decay")
     parser.add_argument("--grad_clip", type=float, default=1.0, help="gradient clip")
     parser.add_argument("--seed", type=int, default=42, help="random seed")
-    parser.add_argument("--distributed", type=str2bool, default=False, help="Distributed Training")
     parser.add_argument("--mixed_precision", type=str, default='none', choices=['fp16', 'bf16', 'fp32', 'none'], help='mixed precision')
     
     # ddpm
@@ -137,14 +136,14 @@ def main():
         transforms.Normalize([0.5] * 3, [0.5] * 3)  # Normalizes to [-1, 1]
     ])
     # TOOD: use image folder for your train dataset
-    # train_dataset = datasets.ImageFolder(root=args.data_dir, transform=transform)
+    train_dataset = datasets.ImageFolder(root=args.data_dir, transform=transform)
 
-    train_dataset = datasets.CIFAR10(
-    root='./data',  # Directory to save the dataset
-    train=True,  # True for training data
-    download=True,  # Download the dataset if not already downloaded
-    transform=transform  # Apply transformations
-)
+#     train_dataset = datasets.CIFAR10(
+#     root='./data',  # Directory to save the dataset
+#     train=True,  # True for training data
+#     download=False,  # Download the dataset if not already downloaded
+#     transform=transform  # Apply transformations
+# )
 
 
     # TODO: setup dataloader
@@ -207,7 +206,7 @@ def main():
     class_embedder = None
     if args.use_cfg:
         # TODO: 
-        class_embedder = ClassEmbedder(num_classes=args.num_classes)
+        class_embedder = ClassEmbedder(embed_dim=128, n_classes=args.num_classes)
         
     # send to device
     unet = unet.to(device)

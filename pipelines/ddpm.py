@@ -81,7 +81,7 @@ class DDPMPipeline:
                 classes = torch.tensor(classes, device=device)
             
             # TODO: get uncond classes
-            uncond_classes = torch.zeros_like(classes) 
+            uncond_classes = torch.full((batch_size,), self.class_embedder.num_classes, device=device)
             # TODO: get class embeddings from classes
             class_embeds = self.class_embedder(classes) 
             # TODO: get uncon class embeddings
@@ -122,6 +122,7 @@ class DDPMPipeline:
         # NOTE: this is for latent DDPM
         # TODO: use VQVAE to get final image
         if self.vae is not None:
+            image = image / 0.1845
             # NOTE: remember to rescale your images
             image = self.vae.decode(image)
             # TODO: clamp your images values

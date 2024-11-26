@@ -7,7 +7,7 @@ class ClassEmbedder(nn.Module):
         super().__init__()
         
         # TODO: implement the class embeddering layer for CFG using nn.Embedding
-        self.embedding = nn.Embedding(n_classes, embed_dim)
+        self.embedding = nn.Embedding(n_classes + 1, embed_dim)
         self.cond_drop_rate = cond_drop_rate
         self.num_classes = n_classes
 
@@ -15,8 +15,8 @@ class ClassEmbedder(nn.Module):
         b = x.shape[0]
         
         if self.cond_drop_rate > 0 and self.training:
-            mask = torch.rand(b) < self.cond_drop_rate
-            x[mask] = self.num_classes
+            mask = torch.rand(b, device=x.device) < self.cond_drop_rate
+            x = torch.where(mask, torch.full_like(x, self.num_classes, device=x.device), x)
         
         # TODO: get embedding: N, embed_dim
         c = self.embedding(x)
