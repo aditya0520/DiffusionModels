@@ -390,7 +390,8 @@ def main():
                 logger.info(f"Epoch {epoch+1}/{args.num_epochs}, Step {step}/{num_update_steps_per_epoch}, Loss {loss.item()} ({loss_m.avg})")
                 wandb_logger.log({'loss': loss_m.avg})
         
-        wandb_logger.log({'lr': current_lr})
+        if is_primary(args):
+            wandb_logger.log({'lr': current_lr})
         lr_scheduler.step()
 
         # validation
