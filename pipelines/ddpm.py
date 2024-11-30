@@ -106,7 +106,6 @@ class DDPMPipeline:
                 model_input = image 
                 # NOTE: leave c as None if you are not using CFG
                 c = None
-            
             # TODO: 1. predict noise model_output
             model_output = self.unet(model_input, t, c)
             

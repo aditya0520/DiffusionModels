@@ -401,8 +401,8 @@ def main():
         
         # NOTE: this is for CFG
         if args.use_cfg:
-            # random sample 4 classes
-            classes = torch.randint(0, args.num_classes, (4,), device=device)
+            # random sample batch_size classes
+            classes = torch.randint(0, args.num_classes, (args.batch_size,), device=device)
             # TODO: fill pipeline
             gen_images = pipeline(batch_size=args.batch_size, num_inference_steps=args.num_inference_steps, classes=classes, guidance_scale=args.cfg_guidance_scale, generator=generator, device=device)
         else:
