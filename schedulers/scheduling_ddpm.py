@@ -45,34 +45,27 @@ class DDPMScheduler(nn.Module):
             # This is the DDPM implementation
             betas = torch.linspace(self.beta_start, self.beta_end, self.num_train_timesteps)
             self.register_buffer("betas", betas)
-            alphas = 1.0 - betas 
-            self.register_buffer("alphas", alphas)
-            alphas_cumprod = torch.cumprod(alphas, dim=0) 
-            self.register_buffer("alphas_cumprod", alphas_cumprod)
         
         elif self.beta_schedule == 'cosine':
-            timesteps = torch.arange(0, self.num_train_timesteps + 1, dtype=torch.float64)
             s = 0.008
-            alphas_cumprod = torch.cos(
-                (timesteps / self.num_train_timesteps + s) / (1 + s) * np.pi / 2
-            ) ** 2
+            steps = self.num_train_timesteps + 1
+            x = torch.linspace(0, self.num_train_timesteps, steps)
+            alphas_cumprod = torch.cos(((x / self.num_train_timesteps) + s) / (1 + s) * torch.pi * 0.5) ** 2
             alphas_cumprod = alphas_cumprod / alphas_cumprod[0]
-            self.register_buffer("alphas_cumprod", alphas_cumprod)
             betas = 1 - (alphas_cumprod[1:] / alphas_cumprod[:-1])
-            betas = torch.clamp(betas, min=1e-8, max=0.999)
+            betas = torch.clip(betas, 0.0001, 0.9999)
             self.register_buffer("betas", betas)
-            alphas = 1.0 - betas 
-            self.register_buffer("alphas", alphas)
         
         elif self.beta_schedule == 'sigmoid':
             timesteps = torch.linspace(-6, 6, self.num_train_timesteps, dtype=torch.float64)
             sigmoid = torch.sigmoid(timesteps)
             betas = self.beta_start + (self.beta_end - self.beta_start) * sigmoid
             self.register_buffer("betas", betas)
-            alphas = 1.0 - betas
-            self.register_buffer("alphas", alphas)
-            alphas_cumprod = torch.cumprod(alphas, dim=0)
-            self.register_buffer("alphas_cumprod", alphas_cumprod)
+        
+        alphas = 1.0 - betas 
+        self.register_buffer("alphas", alphas)
+        alphas_cumprod = torch.cumprod(alphas, dim=0) 
+        self.register_buffer("alphas_cumprod", alphas_cumprod)
         
 
     def set_timesteps(
