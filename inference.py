@@ -67,7 +67,7 @@ def main():
     class_embedder = None
     if args.use_cfg:
         # TODO: class embeder
-        class_embedder = ClassEmbedder(None)
+        class_embedder = ClassEmbedder(embed_dim=128, n_classes=args.num_classes)
         
     # send to device
     unet = unet.to(device)
@@ -97,7 +97,8 @@ def main():
     pipeline =  DDPMPipeline(
     unet=unet,
     scheduler=scheduler,
-    vae=None
+    vae=vae,
+    class_embedder = class_embedder
     )
 
     
@@ -108,7 +109,7 @@ def main():
         transforms.ToTensor(),
         transforms.Normalize((0.5,), (0.5,))
     ])
-    val_dataset = datasets.CIFAR10(root='./data', train=False, download=True, transform=val_transform)
+    val_dataset = datasets.ImageFolder(root="/content/hw5_code/data/imagenet100_128x128/validation", transform=val_transform)
     val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
 
     wandb_logger = wandb.init(
@@ -123,10 +124,11 @@ def main():
         # generate 50 images per class
         for i in tqdm(range(args.num_classes)):
             logger.info(f"Generating 50 images for class {i}")
-            batch_size = 50
+            batch_size = 25
             classes = torch.full((batch_size,), i, dtype=torch.long, device=device)
-            gen_images = None 
-            all_images.append(gen_images)
+            gen_images_pil = pipeline(batch_size=batch_size, num_inference_steps=args.num_inference_steps, classes=classes, guidance_scale=args.cfg_guidance_scale, generator=generator, device=device)
+            gen_images_tensor = torch.stack([val_transform(img) for img in gen_images_pil])
+            all_images.append(gen_images_tensor)
     else:
         # generate 5000 images
         batch_size = args.batch_size 
