@@ -103,13 +103,13 @@ Preprocessing includes resizing, normalization, and conversion to PyTorch tensor
 ## Generated Images
 
 ### Cosine DDPM with CFG on ImageNet-128
-![Cosine DDPM with CFG on ImageNet-128](DDPM-CFG.png)
+![Cosine DDPM with CFG on ImageNet-128](images/DDPM-CFG.png)
 
 ### DDIM on CIFAR-10
-![DDIM on CIFAR-10](images/ddim_cifar10.png)
+![DDIM on CIFAR-10](images/DDIM.png)
 
 ### Latent DDPM with CFG on ImageNet-128
-![Latent DDPM with CFG on ImageNet-128](images/latent_ddpm_cfg_imagenet128.png)
+![Latent DDPM with CFG on ImageNet-128](images/Latent\ DDPM-CFG.png)
 
 ---
 
