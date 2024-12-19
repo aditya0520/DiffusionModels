@@ -1,91 +1,124 @@
-<<<<<<< HEAD
-# DiffusionModels
-=======
-# IDL24Fall-HW5
+# Diffusion Models for Image Generation
 
-# Starter Code Usage
+## Overview
 
-**Training**
+This project implements and evaluates state-of-the-art diffusion-based generative models, including:
+- **Denoising Diffusion Probabilistic Models (DDPM)**
+- **Denoising Diffusion Implicit Models (DDIM)**
+- **Latent Diffusion Models (LDM)**
 
-```
-python train.py --config configs/ddpm.yaml
-```
+These models are implemented to generate high-quality images efficiently, with a focus on computational scalability and flexibility. The project utilizes various datasets and evaluates the models based on industry-standard metrics such as **Frechet Inception Distance (FID)** and **Inception Score (IS)**.
 
-**Inference and Evaluating**
+---
 
-```
-python inference.py inference.py
-```
+## Key Features
 
-# 1. Download the data
+1. **DDPM Implementation:**
+   - Progressive noise addition and removal using a U-Net architecture.
+   - Training based on a forward diffusion process and reverse noise prediction.
 
-Please first download the data from here: https://drive.google.com/drive/u/0/folders/1Hr8LU7HHPEad8ALmMo5cvisazsm6zE8Z
+2. **DDIM Scheduler:**
+   - Accelerated inference with deterministic sampling.
+   - Reduced computational cost without compromising output quality.
 
-After download please unzip the data with
+3. **Latent Diffusion Models:**
+   - Utilizes a Variational Autoencoder (VAE) for efficient latent space representation.
+   - Scalable for high-resolution image synthesis.
 
-```
-tar -xvf imagenet100_128x128.tar.gz
-```
+4. **Classifier-Free Guidance (CFG):**
+   - Enhances conditional image generation by interpolating between conditional and unconditional distributions.
 
-# 2.Implementing DDPM from Scratch
+5. **Evaluation Metrics:**
+   - **FID:** Measures similarity between real and generated data distributions.
+   - **IS:** Evaluates the quality and diversity of generated images.
 
-This homework will start from implementing DDPM from scratch.
+---
 
-We provide the basic code structure for you and you will be implementing the following modules (by filling all TODOs)):
+## Installation
 
-```
-1. pipelines/ddpm.py
-2. schedulers/scheduling_ddpm.py
-3. train.py
-4. configs/ddpm.yaml
-```
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/aditya0520/DiffusionModels.git
+   cd DiffusionModels
+   ```
 
-A very basic U-Net architecture is provided to you, and you will need to improve the architecture for better performacne.
+2. Install the required dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-# 3. Implementing DDIM
+3. Download the datasets:
+   - **CIFAR-10** or **ImageNet-128** (used for training and evaluation).
 
-Implement the DDIM from scratch:
+---
 
-```
-1. schedulers/scheduling_ddpm.py
-2. create a config with ddim by setting use_ddim to True
-```
+## Usage
 
-**NOTE: you need to set use_ddim to TRUE**
-
-# 4. Implementing Latent DDPM
-
-Implement the Latent DDPM.
-
-The pre-trained weights of VAE and basic modules are provided. 
-
-Download the pretrained weight here: and put it under a folder named 'pretrained' (create one if it doesn't exsit)
-
-You need to implement:
-
-```
-1. models/vae.py
-2. train.py with vae related stuff
-3. pipeline/ddpm.py with vae related stuff
+### Training
+Run the training script for any of the models:
+```bash
+python train.py --model {ddpm|ddim|ldm} --dataset {cifar10|imagenet128}
 ```
 
-**NOTE: you need to set use_vae to TRUE**
-
-# 5. Implementing CFG
-
-Implement CFG
-
-```
-1. models/class_embedder.py
-2. train.py with cfg related stuff
-3. pipeline/ddpm.py with cfg related stuff
+### Evaluation
+Evaluate the trained models:
+```bash
+python evaluate.py --model {ddpm|ddim|ldm} --metrics {fid|is}
 ```
 
-**NOTE: you need to set use_cfg to TRUE**
-
-# 6. Evaluation
-
+### Image Generation
+Generate images using the trained models:
+```bash
+python generate.py --model {ddpm|ddim|ldm} --num_images <number>
 ```
-inference.py
-```
->>>>>>> 51963f1 (scheduling-ddpm completed)
+
+---
+
+## Project Structure
+
+- `models/`: Contains implementations of DDPM, DDIM, and LDM.
+- `schedulers/`: Implements noise scheduling for DDPM and DDIM.
+- `vae/`: Variational Autoencoder for latent diffusion.
+- `training/`: Scripts for training the models.
+- `evaluation/`: Evaluation scripts for FID and IS metrics.
+- `data/`: Utilities for dataset preprocessing and loading.
+- `utils/`: Helper functions for training, logging, and visualization.
+
+---
+
+## Datasets
+
+- **CIFAR-10**: 32x32 images of 10 classes.
+- **ImageNet-128**: 128x128 images of 100 classes.
+
+Preprocessing includes resizing, normalization, and conversion to PyTorch tensors.
+
+---
+
+## Results
+
+| Experiment | Model | Dataset     | Scheduler       | CFG | FID   | IS    |
+|------------|-------|-------------|-----------------|-----|-------|-------|
+| A          | DDPM  | ImageNet-128 | Linear Beta    | Yes | 342.2 | -     |
+| B          | DDPM  | ImageNet-128 | Cosine Beta    | Yes | 303.1 | -     |
+| C          | DDPM  | ImageNet-128 | Linear Beta    | No  | -     | -     |
+| D          | DDIM  | CIFAR-10     | Linear Beta    | No  | -     | -     |
+
+---
+
+## Contributors
+
+- **Aditya Aayush** - Implementation of DDPM and related experimentation.
+- **Yash Jaiswal** - Implementation of DDIM and optimization research.
+- **Priya Lalwani** - Literature review and report preparation.
+
+---
+
+## References
+
+1. Ho, J. et al., "Denoising Diffusion Probabilistic Models", NeurIPS, 2020.
+2. Song, J. et al., "Denoising Diffusion Implicit Models", ICLR, 2021.
+3. Rombach, R. et al., "High-Resolution Image Synthesis with Latent Diffusion Models", CVPR, 2022.
+
+---
+
