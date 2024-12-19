@@ -57,19 +57,13 @@ These models are implemented to generate high-quality images efficiently, with a
 ### Training
 Run the training script for any of the models:
 ```bash
-python train.py --model {ddpm|ddim|ldm} --dataset {cifar10|imagenet128}
+python train.py --use_ddim {True|False} --beta_schedule {linear|cosine|sigmoid}
 ```
 
 ### Evaluation
 Evaluate the trained models:
 ```bash
-python evaluate.py --model {ddpm|ddim|ldm} --metrics {fid|is}
-```
-
-### Image Generation
-Generate images using the trained models:
-```bash
-python generate.py --model {ddpm|ddim|ldm} --num_images <number>
+python inference.py --use_ddim {True|False} --beta_schedule {linear|cosine|sigmoid}
 ```
 
 ---
@@ -103,6 +97,19 @@ Preprocessing includes resizing, normalization, and conversion to PyTorch tensor
 | B          | DDPM  | ImageNet-128 | Cosine Beta    | Yes | 303.1 | -     |
 | C          | DDPM  | ImageNet-128 | Linear Beta    | No  | -     | -     |
 | D          | DDIM  | CIFAR-10     | Linear Beta    | No  | -     | -     |
+
+---
+
+## Generated Images
+
+### Cosine DDPM with CFG on ImageNet-128
+![Cosine DDPM with CFG on ImageNet-128](images/cosine_ddpm_cfg_imagenet128.png)
+
+### DDIM on CIFAR-10
+![DDIM on CIFAR-10](images/ddim_cifar10.png)
+
+### Latent DDPM with CFG on ImageNet-128
+![Latent DDPM with CFG on ImageNet-128](images/latent_ddpm_cfg_imagenet128.png)
 
 ---
 
