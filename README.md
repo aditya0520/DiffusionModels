@@ -109,7 +109,7 @@ Preprocessing includes resizing, normalization, and conversion to PyTorch tensor
 ![DDIM on CIFAR-10](images/DDIM.png)
 
 ### Latent DDPM with CFG on ImageNet-128
-![Latent DDPM with CFG on ImageNet-128](images/Latent DDPM-CFG.png)
+![Latent DDPM with CFG on ImageNet-128](images/Latent-DDPM-CFG.png)
 
 ---
 
